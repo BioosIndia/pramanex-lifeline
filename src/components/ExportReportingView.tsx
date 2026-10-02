@@ -15,11 +15,13 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { ShortageEvent, ExportFormatType } from '../types';
 
 export const ExportReportingView: React.FC = () => {
   const { events } = useApp();
   const { profile } = useAuth();
+  const { t } = useLanguage();
 
   const [selectedEventId, setSelectedEventId] = useState<string>(events[0]?.id || '');
   const [exportFormat, setExportFormat] = useState<ExportFormatType>('AUDIT_PDF');
@@ -243,10 +245,10 @@ Absence of local pharmacy stock is not implied by national shortage filings.
             <span>EXPORT & REGULATORY REPORTING FORMATS</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-            Interoperable Compliance Dossiers & Clinical Data Exports
+            {t('export.title')}
           </h2>
           <p className="mt-2 text-xs sm:text-sm text-slate-600">
-            Generate audit-ready reports in PDF, HL7 FHIR, XML Gazette, CSV, and JSON with cryptographic SHA-256 seals.
+            {t('export.subtitle')}
           </p>
         </div>
 
@@ -319,7 +321,7 @@ Absence of local pharmacy stock is not implied by national shortage filings.
                   className="flex-1 py-3 px-4 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-sm flex items-center justify-center gap-2"
                 >
                   <Download className="w-4 h-4" />
-                  <span>Download File</span>
+                  <span>{t('export.download')}</span>
                 </button>
                 <button
                   onClick={handleCopy}
@@ -327,7 +329,7 @@ Absence of local pharmacy stock is not implied by national shortage filings.
                   title="Copy formatted text to clipboard"
                 >
                   <Copy className="w-4 h-4 text-slate-500" />
-                  <span>Copy</span>
+                  <span>{t('export.copy')}</span>
                 </button>
                 <button
                   onClick={handlePrint}
@@ -335,7 +337,7 @@ Absence of local pharmacy stock is not implied by national shortage filings.
                   title="Print dossier document"
                 >
                   <Printer className="w-4 h-4 text-slate-500" />
-                  <span>Print</span>
+                  <span>{t('export.print')}</span>
                 </button>
               </div>
             </div>

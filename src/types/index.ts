@@ -154,6 +154,23 @@ export interface DependencyEdge {
   label: string;
 }
 
+export type SubscriptionTier = 'community' | 'pharmacist_pro' | 'enterprise_mah' | 'sovereign_gov';
+
+export interface PricingPlan {
+  id: SubscriptionTier;
+  name: string;
+  badge?: string;
+  popular?: boolean;
+  tagline: string;
+  monthlyPrice: number;
+  annualPrice: number;
+  features: string[];
+  exemptionsOrLimits: string;
+  ctaText: string;
+  stripePriceIdMonth: string;
+  stripePriceIdYear: string;
+}
+
 export interface UserProfile {
   uid: string;
   email: string | null;
@@ -161,6 +178,10 @@ export interface UserProfile {
   role: UserRole;
   organization?: string;
   jurisdictionPreference?: JurisdictionCode;
+  subscriptionTier?: SubscriptionTier;
+  biometricEnrolled?: boolean;
+  biometricCredentialId?: string;
+  stripeCustomerId?: string;
 }
 
 export interface ChatMessage {

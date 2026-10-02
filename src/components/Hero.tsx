@@ -16,6 +16,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { useLanguage } from '../context/LanguageContext';
 import { ShortageEvent } from '../types';
 
 interface HeroProps {
@@ -26,6 +27,7 @@ interface HeroProps {
 
 export const Hero: React.FC<HeroProps> = ({ onSearchSubmit, onSelectEvent, onGoToConsole }) => {
   const { events, sourceHealth, setSelectedEvent } = useApp();
+  const { t } = useLanguage();
   const [quickQuery, setQuickQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'all' | 'us' | 'eu'>('all');
 
@@ -53,19 +55,18 @@ export const Hero: React.FC<HeroProps> = ({ onSearchSubmit, onSelectEvent, onGoT
         {/* Eyebrow Pill Badge */}
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-md border border-white/20 text-white text-xs sm:text-sm font-medium tracking-wide mb-6 shadow-sm">
           <span className="text-sky-300 font-bold">✦</span>
-          <span>Official-Source Medicine Supply Intelligence</span>
+          <span>{t('hero.badge')}</span>
         </div>
 
         {/* Hero Title */}
         <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight leading-[1.12] max-w-4xl mx-auto">
-          Understand Medicine Shortage Signals{' '}
-          <span className="text-sky-200">Without Losing the Source.</span>
+          {t('hero.title')}{' '}
+          <span className="text-sky-200">{t('hero.titleHighlight')}</span>
         </h1>
 
         {/* Supporting Copy */}
         <p className="mt-5 text-base sm:text-lg md:text-xl text-blue-100 max-w-2xl mx-auto font-normal leading-relaxed">
-          Search official shortage information, track source freshness, compare
-          jurisdiction-specific signals and receive evidence-linked updates without hiding uncertainty.
+          {t('hero.subtitle')}
         </p>
 
         {/* Central Search Bar — FlowSuite Hero Form Pattern */}
@@ -80,21 +81,21 @@ export const Hero: React.FC<HeroProps> = ({ onSearchSubmit, onSelectEvent, onGoT
             type="text"
             value={quickQuery}
             onChange={(e) => setQuickQuery(e.target.value)}
-            placeholder="Search medicine, presentation, or active substance..."
+            placeholder={t('hero.searchPlaceholder')}
             className="flex-1 bg-transparent py-2.5 px-2 text-slate-800 text-sm sm:text-base placeholder:text-slate-400 focus:outline-none"
           />
           <button
             type="submit"
             className="px-6 py-3 rounded-full bg-slate-950 hover:bg-black text-white text-xs sm:text-sm font-semibold transition-all shadow-md flex items-center gap-1.5 shrink-0 active:scale-95"
           >
-            <span>Search</span>
+            <span>{t('hero.searchBtn')}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </form>
 
         {/* Quick Search Chips */}
         <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-xs text-blue-100">
-          <span className="text-blue-200">Common signals:</span>
+          <span className="text-blue-200">{t('hero.commonSignals')}</span>
           {['Amoxicillin', 'Semaglutide', 'Cefepime', 'Carboplatin', 'Methotrexate'].map((chip) => (
             <button
               key={chip}
@@ -116,7 +117,7 @@ export const Hero: React.FC<HeroProps> = ({ onSearchSubmit, onSelectEvent, onGoT
                 <span className="w-3 h-3 rounded-full bg-amber-400/90 inline-block" />
                 <span className="w-3 h-3 rounded-full bg-emerald-400/90 inline-block" />
                 <span className="text-xs font-semibold text-slate-500 ml-3 tracking-wide">
-                  PRAMANEX LIFELINE OS v28.4 — Verified Regulatory Node
+                  {t('hero.windowTitle')}
                 </span>
               </div>
               <div className="flex items-center gap-2 text-xs text-slate-500">
@@ -133,7 +134,7 @@ export const Hero: React.FC<HeroProps> = ({ onSearchSubmit, onSelectEvent, onGoT
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
                 <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
                   <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
-                    <span>Active Shortages</span>
+                    <span>{t('hero.activeShortages')}</span>
                     <span className="text-[10px] font-semibold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded">
                       National
                     </span>
@@ -149,7 +150,7 @@ export const Hero: React.FC<HeroProps> = ({ onSearchSubmit, onSelectEvent, onGoT
 
                 <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
                   <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
-                    <span>Monitored Feeds</span>
+                    <span>{t('hero.monitoredFeeds')}</span>
                     <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">
                       Official
                     </span>
@@ -163,7 +164,7 @@ export const Hero: React.FC<HeroProps> = ({ onSearchSubmit, onSelectEvent, onGoT
 
                 <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
                   <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
-                    <span>Freshness Index</span>
+                    <span>{t('hero.freshnessIndex')}</span>
                     <span className="text-[10px] font-semibold text-sky-700 bg-sky-50 px-1.5 py-0.5 rounded">
                       Verified
                     </span>
@@ -177,7 +178,7 @@ export const Hero: React.FC<HeroProps> = ({ onSearchSubmit, onSelectEvent, onGoT
 
                 <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
                   <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
-                    <span>Cross-Source Split</span>
+                    <span>{t('hero.crossSplit')}</span>
                     <span className="text-[10px] font-semibold text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded">
                       Reconciled
                     </span>
@@ -334,7 +335,7 @@ export const Hero: React.FC<HeroProps> = ({ onSearchSubmit, onSelectEvent, onGoT
                         activeTab === 'all' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100'
                       }`}
                     >
-                      All
+                      {t('hero.tabAll')}
                     </button>
                     <button
                       onClick={() => setActiveTab('us')}
@@ -342,7 +343,7 @@ export const Hero: React.FC<HeroProps> = ({ onSearchSubmit, onSelectEvent, onGoT
                         activeTab === 'us' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100'
                       }`}
                     >
-                      US FDA
+                      {t('hero.tabUS')}
                     </button>
                     <button
                       onClick={() => setActiveTab('eu')}
@@ -350,13 +351,13 @@ export const Hero: React.FC<HeroProps> = ({ onSearchSubmit, onSelectEvent, onGoT
                         activeTab === 'eu' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100'
                       }`}
                     >
-                      EMA
+                      {t('hero.tabEU')}
                     </button>
                     <button
                       onClick={onGoToConsole}
                       className="text-xs text-blue-600 hover:text-blue-800 font-semibold flex items-center gap-1 ml-2"
                     >
-                      Full Command Center <ChevronRight className="w-3.5 h-3.5" />
+                      {t('hero.openConsole')} <ChevronRight className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>

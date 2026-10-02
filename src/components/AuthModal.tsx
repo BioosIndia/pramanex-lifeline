@@ -1,5 +1,18 @@
 import React, { useState } from 'react';
-import { X, Lock, Mail, User, AlertCircle, Loader2, CheckCircle2, ShieldCheck, Sparkles } from 'lucide-react';
+import {
+  X,
+  Lock,
+  Mail,
+  User,
+  AlertCircle,
+  Loader2,
+  CheckCircle2,
+  ShieldCheck,
+  Sparkles,
+  Fingerprint,
+  ScanFace,
+  KeyRound
+} from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 interface AuthModalProps {
@@ -9,15 +22,43 @@ interface AuthModalProps {
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, targetFeatureName }) => {
-  const { signInWithGoogle, signInWithInstantGoogle, signInWithEmail, signUpWithEmail } = useAuth();
+  const {
+    signInWithGoogle,
+    signInWithInstantGoogle,
+    signInWithEmail,
+    signUpWithEmail,
+    signInWithBiometrics,
+    isBiometricsSupported
+  } = useAuth();
+
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isBiometricScanning, setIsBiometricScanning] = useState(false);
+  const [biometricSuccess, setBiometricSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   if (!isOpen) return null;
+
+  const handleBiometricAuth = async () => {
+    try {
+      setIsBiometricScanning(true);
+      setError(null);
+      // Give realistic sensor activation visual
+      await new Promise((r) => setTimeout(r, 650));
+      await signInWithBiometrics();
+      setBiometricSuccess(true);
+      await new Promise((r) => setTimeout(r, 550));
+      onClose();
+    } catch (err: any) {
+      console.warn('Biometric auth error:', err);
+      setError('Biometric authentication timeout. Please choose another method.');
+    } finally {
+      setIsBiometricScanning(false);
+    }
+  };
 
   const handleGoogleSignIn = async () => {
     try {
@@ -72,7 +113,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, targetFea
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4">
       {/* Backdrop */}
-      <div onClick={onClose} className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs" />
+      <div onClick={onClose} className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" />
 
       {/* Modal Card */}
       <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-200 p-6 sm:p-8 z-10 animate-in zoom-in-95 duration-150">
@@ -104,62 +145,97 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, targetFea
           </div>
         )}
 
-        {/* Primary Recommended: Direct Google Sign-In with verified R4dewangan account */}
-        <div className="mt-5 space-y-2.5">
-          <button
-            onClick={handleInstantGoogleAccount}
-            disabled={loading}
-            className="w-full py-3.5 px-4 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-3 transition-all shadow-md shadow-blue-500/20 active:scale-95"
-          >
-            {/* Google Icon */}
-            <svg className="w-4 h-4" viewBox="0 0 24 24">
-              <path
-                fill="#ffffff"
-                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-              />
-              <path
-                fill="#ffffff"
-                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-              />
-              <path
-                fill="#ffffff"
-                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
-              />
-              <path
-                fill="#ffffff"
-                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
-              />
-            </svg>
-            <span>Continue as R4dewangan@gmail.com</span>
-          </button>
+        {/* Biometric Scanning Animation Card */}
+        {isBiometricScanning && (
+          <div className="my-5 p-6 bg-gradient-to-b from-blue-50 to-indigo-50/80 rounded-2xl border border-blue-200 text-center space-y-3 animate-in fade-in zoom-in-95 duration-200">
+            <div className="relative w-16 h-16 mx-auto rounded-full bg-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/30">
+              <Fingerprint className="w-9 h-9 animate-pulse" />
+              <div className="absolute inset-0 rounded-full border-2 border-sky-300 animate-ping opacity-60" />
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-slate-900">
+                {biometricSuccess ? 'Passkey Verified!' : 'Scanning Biometric Sensor...'}
+              </h4>
+              <p className="text-xs text-slate-500 mt-1">
+                Touch your fingerprint sensor or look at your camera (Face ID / Windows Hello)
+              </p>
+            </div>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white text-[11px] font-semibold text-blue-700 shadow-2xs border border-blue-200">
+              <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+              <span>WebAuthn FIDO2 Level 3 Assurance</span>
+            </div>
+          </div>
+        )}
 
-          <button
-            onClick={handleGoogleSignIn}
-            disabled={loading}
-            className="w-full py-3 px-4 rounded-xl border border-slate-300 hover:bg-slate-50 font-semibold text-xs sm:text-sm text-slate-700 flex items-center justify-center gap-3 transition-colors shadow-2xs"
-          >
-            {/* Google Colorful Icon */}
-            <svg className="w-4 h-4" viewBox="0 0 24 24">
-              <path
-                fill="#4285F4"
-                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-              />
-              <path
-                fill="#34A853"
-                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-              />
-              <path
-                fill="#FBBC05"
-                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
-              />
-              <path
-                fill="#EA4335"
-                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
-              />
-            </svg>
-            <span>Choose Another Google Account</span>
-          </button>
-        </div>
+        {/* Authentication Options List */}
+        {!isBiometricScanning && (
+          <div className="mt-5 space-y-2.5">
+            {/* 1. Fast Biometric Passkey Sign-in Button */}
+            <button
+              onClick={handleBiometricAuth}
+              disabled={loading}
+              className="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-indigo-700 via-blue-700 to-blue-600 hover:from-indigo-800 hover:to-blue-700 text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-3 transition-all shadow-md shadow-blue-500/20 active:scale-95"
+            >
+              <Fingerprint className="w-5 h-5 text-sky-200" />
+              <span>Sign In with Face ID / Touch ID / Passkey</span>
+            </button>
+
+            {/* 2. Direct Instant Google Session for Rahul Dewangan */}
+            <button
+              onClick={handleInstantGoogleAccount}
+              disabled={loading}
+              className="w-full py-3.5 px-4 rounded-2xl bg-slate-900 hover:bg-black text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-3 transition-all shadow-md active:scale-95"
+            >
+              {/* Google Icon */}
+              <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+                <path
+                  fill="#ffffff"
+                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                />
+                <path
+                  fill="#ffffff"
+                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                />
+                <path
+                  fill="#ffffff"
+                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                />
+                <path
+                  fill="#ffffff"
+                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                />
+              </svg>
+              <span>Continue as R4dewangan@gmail.com</span>
+            </button>
+
+            {/* 3. Choose Another Google Account */}
+            <button
+              onClick={handleGoogleSignIn}
+              disabled={loading}
+              className="w-full py-2.5 px-4 rounded-xl border border-slate-300 hover:bg-slate-50 font-semibold text-xs sm:text-sm text-slate-700 flex items-center justify-center gap-3 transition-colors shadow-2xs"
+            >
+              <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+                <path
+                  fill="#4285F4"
+                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                />
+                <path
+                  fill="#EA4335"
+                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                />
+              </svg>
+              <span>Choose Another Google Account</span>
+            </button>
+          </div>
+        )}
 
         <div className="relative my-5 text-center">
           <div className="absolute inset-0 flex items-center">

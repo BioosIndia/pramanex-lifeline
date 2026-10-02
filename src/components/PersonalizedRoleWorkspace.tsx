@@ -14,11 +14,17 @@ import {
   ExternalLink,
   Lock,
   Layers,
-  Sparkles
+  Sparkles,
+  Fingerprint,
+  CreditCard,
+  Zap,
+  ArrowRight
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
-import { UserRole } from '../types';
+import { UserRole, SubscriptionTier } from '../types';
+import { PRICING_PLANS } from './PricingSection';
+import { StripeCheckoutModal } from './StripeCheckoutModal';
 import { CollaborativeAnnotationsPanel } from './CollaborativeAnnotationsPanel';
 import { OfficialBulletinsViewer } from './OfficialBulletinsViewer';
 import { GlobalSupplyMap } from './GlobalSupplyMap';
@@ -26,10 +32,23 @@ import { AgentSwarmConsole } from './AgentSwarmConsole';
 import { ExportReportingView } from './ExportReportingView';
 
 export const PersonalizedRoleWorkspace: React.FC = () => {
-  const { profile, switchRole } = useAuth();
+  const { profile, switchRole, enrollBiometrics, signInWithBiometrics } = useAuth();
   const { events, conflicts, sourceHealth, auditLogs, setSelectedEvent } = useApp();
 
+  const [isStripeOpen, setIsStripeOpen] = useState(false);
+  const [biometricFeedback, setBiometricFeedback] = useState<string | null>(null);
+
   const currentRole: UserRole = profile?.role || 'pharmacist';
+  const currentTier: SubscriptionTier = profile?.subscriptionTier || 'pharmacist_pro';
+  const currentPlan = PRICING_PLANS.find((p) => p.id === currentTier) || PRICING_PLANS[1];
+
+  const handleTestBiometrics = async () => {
+    setBiometricFeedback('Testing platform biometric sensor...');
+    await new Promise((r) => setTimeout(r, 600));
+    await enrollBiometrics();
+    setBiometricFeedback('Biometric Passkey Verified & Device Authorized (FIDO2 L3)!');
+    setTimeout(() => setBiometricFeedback(null), 3500);
+  };
 
   return (
     <div className="space-y-8">
@@ -74,6 +93,54 @@ export const PersonalizedRoleWorkspace: React.FC = () => {
           ))}
         </div>
       </div>
+
+      {/* Subscription Tier & Biometric Security Bar */}
+      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-950 rounded-3xl p-6 text-white shadow-xl flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        <div className="flex items-start sm:items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center shrink-0 shadow-md">
+            <Zap className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-extrabold text-white">Tier: {currentPlan.name}</span>
+              <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-emerald-400/20 text-emerald-300 border border-emerald-400/30">
+                ACTIVE LICENSE
+              </span>
+            </div>
+            <p className="text-xs text-slate-300 mt-1 max-w-xl">
+              {currentPlan.tagline} • Includes instant sovereign feed syndication & compliance dossier export.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Biometrics Status & Test button */}
+          <button
+            onClick={handleTestBiometrics}
+            className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/20 border border-white/20 text-white transition-colors flex items-center gap-2"
+            title="Authenticate with Touch ID / Face ID"
+          >
+            <Fingerprint className="w-4 h-4 text-sky-300" />
+            <span>Biometrics Enrolled</span>
+          </button>
+
+          {/* Manage / Upgrade via Stripe */}
+          <button
+            onClick={() => setIsStripeOpen(true)}
+            className="px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white transition-all shadow-md flex items-center gap-1.5"
+          >
+            <CreditCard className="w-4 h-4" />
+            <span>Billing & Upgrade</span>
+          </button>
+        </div>
+      </div>
+
+      {biometricFeedback && (
+        <div className="p-3.5 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold rounded-2xl flex items-center gap-2 animate-in fade-in duration-150">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+          <span>{biometricFeedback}</span>
+        </div>
+      )}
 
       {/* 1. CONSUMER / PATIENT VIEW */}
       {currentRole === 'consumer' && (
@@ -239,6 +306,14 @@ export const PersonalizedRoleWorkspace: React.FC = () => {
           <AgentSwarmConsole />
         </div>
       )}
+
+      {/* Stripe Interactive Checkout Modal */}
+      <StripeCheckoutModal
+        isOpen={isStripeOpen}
+        onClose={() => setIsStripeOpen(false)}
+        selectedPlan={currentPlan}
+        billingPeriod="annual"
+      />
     </div>
   );
 };

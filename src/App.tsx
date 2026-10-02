@@ -6,6 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AppProvider, useApp } from './context/AppContext';
+import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { ProofStrip } from './components/ProofStrip';
@@ -21,6 +22,8 @@ import { CommandCenterDashboard } from './components/CommandCenterDashboard';
 import { ConsumerPWAView } from './components/ConsumerPWAView';
 import { MethodologyView } from './components/MethodologyView';
 import { AuthenticatedOSView } from './components/AuthenticatedOSView';
+import { PricingSection } from './components/PricingSection';
+import { ScrollReveal } from './components/ScrollReveal';
 import { AssistantDrawer } from './components/AssistantDrawer';
 import { WebSearchGroundingModal } from './components/WebSearchGroundingModal';
 import { AuthModal } from './components/AuthModal';
@@ -129,69 +132,92 @@ const MainLayout: React.FC = () => {
             </div>
 
             {/* 2. Capability Trust Proof Strip */}
-            <ProofStrip />
+            <ScrollReveal direction="up" delay={0.05}>
+              <ProofStrip />
+            </ScrollReveal>
 
             {/* 3. Embedded Live Medicine Search UI Engine (YouTube-style autocomplete) */}
-            <div id="search-section" className="scroll-mt-16">
-              <SearchEngineUI />
-            </div>
+            <ScrollReveal direction="up" delay={0.08}>
+              <div id="search-section" className="scroll-mt-16">
+                <SearchEngineUI />
+              </div>
+            </ScrollReveal>
 
             {/* 4. 4 Feature Grid Cards */}
-            <div id="features-section" className="scroll-mt-16">
-              <FeaturesGrid
-                onExploreModule={(mod) => {
-                  if (mod === 'search') {
-                    document.getElementById('search-section')?.scrollIntoView({ behavior: 'smooth' });
-                  } else if (mod === 'dashboard') {
-                    if (currentUser) {
-                      setIsEnterpriseOSActive(true);
-                    } else {
-                      document.getElementById('alerts-section')?.scrollIntoView({ behavior: 'smooth' });
+            <ScrollReveal direction="up" delay={0.08}>
+              <div id="features-section" className="scroll-mt-16">
+                <FeaturesGrid
+                  onExploreModule={(mod) => {
+                    if (mod === 'search') {
+                      document.getElementById('search-section')?.scrollIntoView({ behavior: 'smooth' });
+                    } else if (mod === 'dashboard') {
+                      if (currentUser) {
+                        setIsEnterpriseOSActive(true);
+                      } else {
+                        document.getElementById('alerts-section')?.scrollIntoView({ behavior: 'smooth' });
+                      }
                     }
-                  }
-                }}
-              />
-            </div>
+                  }}
+                />
+              </div>
+            </ScrollReveal>
 
             {/* 5. Real-Time Shortage Alert Engine Section */}
-            <div id="alerts-section" className="scroll-mt-16">
-              <ShortageAlertEngine />
-            </div>
+            <ScrollReveal direction="up" delay={0.08}>
+              <div id="alerts-section" className="scroll-mt-16">
+                <ShortageAlertEngine />
+              </div>
+            </ScrollReveal>
 
             {/* 6. Standardized Regulatory Export & Dossier Section */}
-            <div id="export-section" className="scroll-mt-16">
-              <ExportReportingView />
-            </div>
+            <ScrollReveal direction="up" delay={0.08}>
+              <div id="export-section" className="scroll-mt-16">
+                <ExportReportingView />
+              </div>
+            </ScrollReveal>
 
-            {/* 7. Interactive 3D Pipeline Architecture */}
-            <div id="architecture-section" className="scroll-mt-16">
-              <Architecture3D />
-            </div>
+            {/* 7. SaaS Tiered Pricing & Stripe Billing Section */}
+            <ScrollReveal direction="up" delay={0.08}>
+              <div id="pricing-section" className="scroll-mt-16">
+                <PricingSection />
+              </div>
+            </ScrollReveal>
 
-            {/* 8. Roles & Workspaces Section */}
-            <div id="roles-section" className="scroll-mt-16">
-              <RolesSection
-                onSelectRoleAction={(role) => {
-                  if (role === 'consumer') {
-                    setActiveTab('consumer');
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  } else if (role === 'pharmacist') {
-                    document.getElementById('search-section')?.scrollIntoView({ behavior: 'smooth' });
-                  } else {
-                    if (currentUser) {
-                      setIsEnterpriseOSActive(true);
+            {/* 8. Interactive 3D Pipeline Architecture */}
+            <ScrollReveal direction="up" delay={0.08}>
+              <div id="architecture-section" className="scroll-mt-16">
+                <Architecture3D />
+              </div>
+            </ScrollReveal>
+
+            {/* 9. Roles & Workspaces Section */}
+            <ScrollReveal direction="up" delay={0.08}>
+              <div id="roles-section" className="scroll-mt-16">
+                <RolesSection
+                  onSelectRoleAction={(role) => {
+                    if (role === 'consumer') {
+                      setActiveTab('consumer');
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    } else if (role === 'pharmacist') {
+                      document.getElementById('search-section')?.scrollIntoView({ behavior: 'smooth' });
                     } else {
-                      handleOpenAuth('Clinical Workspace');
+                      if (currentUser) {
+                        setIsEnterpriseOSActive(true);
+                      } else {
+                        handleOpenAuth('Clinical Workspace');
+                      }
                     }
-                  }
-                }}
-              />
-            </div>
+                  }}
+                />
+              </div>
+            </ScrollReveal>
 
-            {/* 9. Methodology & Truth Distinctions */}
-            <div id="methodology-section" className="scroll-mt-16">
-              <MethodologyView />
-            </div>
+            {/* 10. Methodology & Truth Distinctions */}
+            <ScrollReveal direction="up" delay={0.08}>
+              <div id="methodology-section" className="scroll-mt-16">
+                <MethodologyView />
+              </div>
+            </ScrollReveal>
 
             {/* 10. Bottom Final CTA Banner (FlowSuite styled) */}
             <section className="py-20 bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 text-white relative overflow-hidden">
@@ -226,6 +252,15 @@ const MainLayout: React.FC = () => {
                   >
                     <Zap className="w-4 h-4 text-amber-300" />
                     <span>Configure Shortage Alerts</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      document.getElementById('pricing-section')?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-xs sm:text-sm transition-all active:scale-95 shadow-md flex items-center justify-center gap-2"
+                  >
+                    <span>View Pricing & Licensing</span>
                   </button>
 
                   <button
@@ -305,9 +340,11 @@ const MainLayout: React.FC = () => {
 export default function App() {
   return (
     <AuthProvider>
-      <AppProvider>
-        <MainLayout />
-      </AppProvider>
+      <LanguageProvider>
+        <AppProvider>
+          <MainLayout />
+        </AppProvider>
+      </LanguageProvider>
     </AuthProvider>
   );
 }

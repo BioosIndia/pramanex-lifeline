@@ -22,9 +22,11 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { useLanguage } from '../context/LanguageContext';
 import { ShortageEvent, JurisdictionCode } from '../types';
 
 export const SearchEngineUI: React.FC = () => {
+  const { t } = useLanguage();
   const {
     events,
     searchFilter,
@@ -189,11 +191,10 @@ export const SearchEngineUI: React.FC = () => {
                 <span>✦ DETERMINISTIC MEDICINE SEARCH ENGINE</span>
               </div>
               <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-                Official Medicine Supply Index
+                {t('search.title')}
               </h1>
               <p className="mt-1 text-sm text-slate-500">
-                Directly cross-referencing {events.length} verified national regulatory filings with
-                instant autocomplete and official source discovery.
+                {t('search.subtitle')}
               </p>
             </div>
 
@@ -203,13 +204,13 @@ export const SearchEngineUI: React.FC = () => {
                 className="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-800 bg-white border border-slate-200 hover:bg-slate-50 shadow-xs flex items-center gap-1.5 transition-colors"
               >
                 <Sparkles className="w-4 h-4 text-blue-600" />
-                <span>Search Grounding</span>
+                <span>{t('nav.webGrounding')}</span>
               </button>
               <button
                 onClick={() => setIsAssistantOpen(true)}
                 className="px-3.5 py-2 rounded-xl text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 shadow-xs flex items-center gap-1.5 transition-colors"
               >
-                <span>Ask Supply AI</span>
+                <span>{t('nav.askAI')}</span>
               </button>
             </div>
           </div>
@@ -228,7 +229,7 @@ export const SearchEngineUI: React.FC = () => {
                   setSearchFilter(e.target.value);
                   setIsDropdownOpen(true);
                 }}
-                placeholder="Search by generic substance, commercial brand, ATC code, or formulation..."
+                placeholder={t('search.inputPlaceholder')}
                 className="w-full pl-12 pr-10 py-4 bg-white rounded-2xl border border-slate-200 shadow-sm text-sm sm:text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
               />
               {searchFilter && (
@@ -322,11 +323,11 @@ export const SearchEngineUI: React.FC = () => {
               onChange={(e) => setSelectedStatusFilter(e.target.value)}
               className="px-3 py-1.5 bg-white rounded-full text-xs font-medium text-slate-700 border border-slate-200 shadow-2xs focus:outline-none"
             >
-              <option value="ALL">All Statuses</option>
-              <option value="SHORTAGE_DECLARED">Shortage Declared</option>
-              <option value="SUPPLY_DISRUPTION">Supply Disruption</option>
-              <option value="RESOLVED">Resolved</option>
-              <option value="CONFLICTING_SOURCES">Conflicting Signals</option>
+              <option value="ALL">{t('search.filterStatus')}: All</option>
+              <option value="SHORTAGE_DECLARED">{t('status.shortageDeclared')}</option>
+              <option value="SUPPLY_DISRUPTION">{t('status.supplyDisruption')}</option>
+              <option value="RESOLVED">{t('status.resolved')}</option>
+              <option value="CONFLICTING_SOURCES">{t('status.conflicting')}</option>
             </select>
 
             {/* Dosage Form Dropdown */}
@@ -335,7 +336,7 @@ export const SearchEngineUI: React.FC = () => {
               onChange={(e) => setSelectedFormFilter(e.target.value)}
               className="px-3 py-1.5 bg-white rounded-full text-xs font-medium text-slate-700 border border-slate-200 shadow-2xs focus:outline-none"
             >
-              <option value="ALL">All Formulations</option>
+              <option value="ALL">{t('search.filterForm')}: All</option>
               <option value="Suspension">Oral Suspension / Liquids</option>
               <option value="Injectable">Injectables & Infusions</option>
               <option value="Inhalation">Inhalation Aerosols</option>
@@ -347,10 +348,10 @@ export const SearchEngineUI: React.FC = () => {
         {/* Results Count & Disclaimers */}
         <div className="flex items-center justify-between text-xs text-slate-500 mb-4 pb-2 border-b border-slate-200">
           <span>
-            Found <strong className="text-slate-800">{filteredEvents.length}</strong> official supply records
+            Found <strong className="text-slate-800">{filteredEvents.length}</strong> {t('search.foundRecords')}
           </span>
           <span className="text-[11px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 hidden sm:inline">
-            Official declarations only • Does not reflect individual retail pharmacy stock
+            {t('disclaimer.text')}
           </span>
         </div>
 

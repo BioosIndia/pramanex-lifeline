@@ -15,10 +15,12 @@ import {
 } from 'lucide-react';
 import { GLOBAL_REGIONS, RegionalSupplyPoint } from '../data/seedData';
 import { useApp } from '../context/AppContext';
+import { useLanguage } from '../context/LanguageContext';
 import { ShortageEvent, JurisdictionCode } from '../types';
 
 export const GlobalSupplyMap: React.FC = () => {
   const { events, setSelectedEvent } = useApp();
+  const { t } = useLanguage();
   const [selectedRegion, setSelectedRegion] = useState<RegionalSupplyPoint>(GLOBAL_REGIONS[0]);
   const [selectedMedicineFilter, setSelectedMedicineFilter] = useState<string>('ALL');
   const [viewMode, setViewMode] = useState<'MAP' | 'TABLE'>('MAP');
@@ -42,10 +44,10 @@ export const GlobalSupplyMap: React.FC = () => {
             <span>GLOBAL SOVEREIGN REGULATORY MAP</span>
           </div>
           <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-            Multi-Jurisdiction Medicine Supply Geography
+            {t('map.title')}
           </h2>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Tracking national filings across sovereign regulatory agencies. Local retail inventory is not inferred.
+            {t('map.subtitle')}
           </p>
         </div>
 

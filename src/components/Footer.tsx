@@ -1,11 +1,14 @@
 import React from 'react';
 import { Activity, ShieldCheck, ExternalLink } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 interface FooterProps {
   onNavigate: (tab: string) => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
+  const { t } = useLanguage();
+
   return (
     <footer className="bg-slate-900 text-white pt-16 pb-12 border-t border-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -21,8 +24,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               </span>
             </div>
             <p className="text-xs text-slate-400 max-w-sm leading-relaxed">
-              Drug Shortage & Medicine Supply Intelligence Operating System. Transforming fragmented
-              government shortage bulletins into source-linked, normalized, freshness-aware records.
+              {t('footer.tagline')}
             </p>
             <div className="flex items-center gap-2 text-xs text-emerald-400">
               <ShieldCheck className="w-4 h-4" />
@@ -122,7 +124,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
 
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-500">
-          <p>© 2026 PRAMANEX LIFELINE OS. All sovereign regulatory records preserved under immutable digest.</p>
+          <p>© 2026 PRAMANEX LIFELINE OS. {t('footer.rights')}</p>
           <div className="flex items-center gap-4">
             <span className="hover:text-slate-300">Privacy Policy</span>
             <span className="hover:text-slate-300">Terms of Service</span>

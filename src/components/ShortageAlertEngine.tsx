@@ -16,11 +16,13 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { ShortageEvent } from '../types';
 
 export const ShortageAlertEngine: React.FC = () => {
   const { events, notifications, setSelectedEvent, isWatched, toggleWatchlist } = useApp();
   const { currentUser, profile } = useAuth();
+  const { t } = useLanguage();
 
   const [selectedMedicineId, setSelectedMedicineId] = useState<string>(events[0]?.id || '');
   const [notifyEmail, setNotifyEmail] = useState(true);
@@ -91,11 +93,10 @@ export const ShortageAlertEngine: React.FC = () => {
             <span>REAL-TIME SHORTAGE ALERT ENGINE</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-            Automated Watchlist & Multi-Channel Shortage Alerts
+            {t('alerts.title')}
           </h2>
           <p className="mt-2 text-xs sm:text-sm text-slate-600">
-            Deduplicated notifications triggered immediately when official regulatory agencies declare,
-            update, or resolve a medicine shortage.
+            {t('alerts.subtitle')}
           </p>
         </div>
 
@@ -208,7 +209,7 @@ export const ShortageAlertEngine: React.FC = () => {
                   className="w-full sm:flex-1 py-3 px-6 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-md shadow-blue-500/20 flex items-center justify-center gap-2"
                 >
                   <Bell className="w-4 h-4" />
-                  <span>Activate Shortage Alerts for {selectedEvent.genericName}</span>
+                  <span>{t('alerts.activateBtn')} ({selectedEvent.genericName})</span>
                 </button>
                 <button
                   type="button"
@@ -217,7 +218,7 @@ export const ShortageAlertEngine: React.FC = () => {
                   title="Test alert dispatch webhook simulator"
                 >
                   <RefreshCw className="w-3.5 h-3.5 text-blue-600" />
-                  <span>Test Signal Dispatch</span>
+                  <span>{t('alerts.testBtn')}</span>
                 </button>
               </div>
             </form>

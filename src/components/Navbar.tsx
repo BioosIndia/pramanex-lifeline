@@ -12,10 +12,13 @@ import {
   ExternalLink,
   FileText,
   Zap,
-  Lock
+  Lock,
+  Globe,
+  CreditCard
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
+import { useLanguage } from '../context/LanguageContext';
 import { UserRole } from '../types';
 
 interface NavbarProps {
@@ -33,9 +36,11 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenA
     setIsAssistantOpen,
     setIsSearchGroundingOpen
   } = useApp();
+  const { currentLanguage, setLanguage, languages, t } = useLanguage();
 
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isRoleMenuOpen, setIsRoleMenuOpen] = useState(false);
+  const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
 
   const roleLabels: Record<UserRole, string> = {
     consumer: 'Consumer / Patient',
@@ -44,6 +49,8 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenA
     supply_analyst: 'Supply Chain Analyst',
     admin: 'System Administrator',
   };
+
+  const currentLangObj = languages.find((l) => l.code === currentLanguage) || languages[0];
 
   const handleNavClick = (tabOrSection: string) => {
     if (activeTab === 'home') {
@@ -57,7 +64,6 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenA
     if (tabOrSection === 'dashboard' || tabOrSection === 'consumer') {
       if (!currentUser) {
         onOpenAuth(tabOrSection === 'dashboard' ? 'Command Center Console' : 'Patient Portal');
-        // also scroll to dashboard preview on landing page
         const previewEl = document.getElementById('dashboard-preview');
         if (previewEl) previewEl.scrollIntoView({ behavior: 'smooth' });
         return;
@@ -104,28 +110,28 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenA
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
               }`}
             >
-              Overview
+              {t('nav.overview')}
             </button>
             <button
               onClick={() => handleNavClick('search-section')}
               className="px-3 py-1.5 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors flex items-center gap-1.5"
             >
               <Search className="w-3.5 h-3.5" />
-              <span>Search</span>
+              <span>{t('nav.search')}</span>
             </button>
             <button
               onClick={() => handleNavClick('alerts-section')}
               className="px-3 py-1.5 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors flex items-center gap-1.5"
             >
               <Zap className="w-3.5 h-3.5 text-amber-500" />
-              <span>Shortage Alerts</span>
+              <span>{t('nav.alerts')}</span>
             </button>
             <button
               onClick={() => handleNavClick('export-section')}
               className="px-3 py-1.5 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors flex items-center gap-1.5"
             >
               <FileText className="w-3.5 h-3.5 text-blue-500" />
-              <span>Export Dossier</span>
+              <span>{t('nav.export')}</span>
             </button>
             <button
               onClick={() => handleNavClick('dashboard')}
@@ -136,7 +142,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenA
               }`}
             >
               <Database className="w-3.5 h-3.5" />
-              <span>Command Center</span>
+              <span>{t('nav.command')}</span>
               {!currentUser && <Lock className="w-3 h-3 text-slate-400" />}
             </button>
             <button
@@ -147,21 +153,59 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenA
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
               }`}
             >
-              Patient Portal
+              {t('nav.patient')}
+            </button>
+            <button
+              onClick={() => handleNavClick('pricing-section')}
+              className="px-3 py-1.5 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors flex items-center gap-1.5"
+            >
+              <CreditCard className="w-3.5 h-3.5 text-emerald-500" />
+              <span>{t('nav.pricing')}</span>
             </button>
           </nav>
 
           {/* Action Header Controls */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Live Search Grounding Button */}
-            <button
-              onClick={() => setIsSearchGroundingOpen(true)}
-              className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors border border-slate-200"
-              title="Query Live Web Grounding for regulatory notices"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-              <span>Web Grounding</span>
-            </button>
+            {/* Multi-Language Selector Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg transition-colors"
+                title="Select Language"
+              >
+                <span>{currentLangObj.flag}</span>
+                <span className="hidden sm:inline">{currentLangObj.nativeName}</span>
+                <ChevronDown className="w-3 h-3 text-slate-400" />
+              </button>
+
+              {isLangMenuOpen && (
+                <div className="absolute right-0 mt-2 w-44 bg-white rounded-2xl shadow-xl border border-slate-200 py-1.5 z-50 animate-in fade-in zoom-in-95 duration-100">
+                  <div className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    Select Language / भाषा
+                  </div>
+                  {languages.map((lang) => (
+                    <button
+                      key={lang.code}
+                      onClick={() => {
+                        setLanguage(lang.code);
+                        setIsLangMenuOpen(false);
+                      }}
+                      className={`w-full text-left px-3 py-2 text-xs transition-colors flex items-center justify-between ${
+                        currentLanguage === lang.code
+                          ? 'bg-blue-50 text-blue-700 font-bold'
+                          : 'text-slate-700 hover:bg-slate-50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span>{lang.flag}</span>
+                        <span>{lang.nativeName}</span>
+                      </div>
+                      <span className="text-[10px] text-slate-400">{lang.name}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
 
             {/* AI Assistant Quick Trigger */}
             <button
@@ -170,7 +214,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenA
               title="Open Gemini Supply Intelligence Assistant"
             >
               <Sparkles className="w-3.5 h-3.5 animate-pulse" />
-              <span className="hidden sm:inline">Ask AI OS</span>
+              <span className="hidden sm:inline">{t('nav.askAI')}</span>
             </button>
 
             {/* Notifications Popover */}
@@ -262,7 +306,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenA
                 <button
                   onClick={signOutUser}
                   className="p-1.5 text-slate-500 hover:text-slate-900 rounded-lg hover:bg-slate-100 transition-colors"
-                  title="Sign Out"
+                  title={t('nav.signOut')}
                 >
                   <LogOut className="w-4 h-4" />
                 </button>
@@ -272,7 +316,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenA
                 onClick={() => onOpenAuth()}
                 className="px-4 py-2 rounded-full text-xs sm:text-sm font-semibold text-white bg-slate-900 hover:bg-black transition-all shadow-sm hover:shadow active:scale-95"
               >
-                Sign In
+                {t('nav.signIn')}
               </button>
             )}
           </div>
