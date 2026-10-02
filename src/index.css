@@ -1,0 +1,18 @@
+@import "tailwindcss";
+
+@layer base {
+  *, ::before, ::after {
+    outline-offset: 0px;
+  }
+
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  select:focus-visible {
+    outline: none;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+}

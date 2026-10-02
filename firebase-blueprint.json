@@ -1,0 +1,87 @@
+{
+  "entities": {
+    "userProfile": {
+      "title": "UserProfile",
+      "description": "User profile with role-based access attributes",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "format": "email", "description": "Email address of user" },
+        "displayName": { "type": "string", "description": "Full name or alias" },
+        "role": { "type": "string", "enum": ["consumer", "pharmacist", "mah_regulatory", "supply_analyst", "admin"], "description": "Role determining access tiers" },
+        "jurisdictionPreference": { "type": "string", "description": "Default jurisdiction for monitoring" },
+        "createdAt": { "type": "string", "description": "ISO timestamp of account creation" }
+      },
+      "required": ["email", "role"]
+    },
+    "shortageEvent": {
+      "title": "ShortageEvent",
+      "description": "Normalized official shortage intelligence event",
+      "type": "object",
+      "properties": {
+        "medicineId": { "type": "string", "description": "Normalized medicine identifier" },
+        "genericName": { "type": "string", "description": "Active pharmaceutical ingredient / generic name" },
+        "brandName": { "type": "string", "description": "Commercial brand presentation" },
+        "presentation": { "type": "string", "description": "Strength, form, and pack specification" },
+        "jurisdiction": { "type": "string", "description": "Regulatory jurisdiction (US, EU, UK, CA, AU)" },
+        "authority": { "type": "string", "description": "Reporting health authority (FDA, EMA, MHRA, Health Canada, TGA)" },
+        "status": { "type": "string", "enum": ["SHORTAGE_DECLARED", "SUPPLY_DISRUPTION", "RESOLVED", "MONITOR", "CONFLICTING_SOURCES"], "description": "Current official status" },
+        "lifecycleState": { "type": "string", "enum": ["OPEN", "STALE", "CONFLICT", "RESOLVED", "HOLD"], "description": "Event lifecycle state" },
+        "reportedCause": { "type": "string", "description": "Official reported cause of supply restriction" },
+        "reportedDuration": { "type": "string", "description": "Estimated timeline or resolution window if published" },
+        "freshnessStatus": { "type": "string", "enum": ["FRESH", "SYNC_DUE", "STALE", "SOURCE_FAILED"], "description": "Data freshness health indicator" },
+        "sourcePublishedAt": { "type": "string", "description": "Timestamp published by regulatory authority" },
+        "lastRetrievedAt": { "type": "string", "description": "Timestamp last ingested and verified by system" },
+        "sourceUrl": { "type": "string", "description": "Official regulatory source notice URL" },
+        "snapshotHash": { "type": "string", "description": "SHA-256 hash of immutable source snapshot" }
+      },
+      "required": ["medicineId", "genericName", "jurisdiction", "authority", "status", "freshnessStatus"]
+    },
+    "watchlistItem": {
+      "title": "WatchlistItem",
+      "description": "User subscription to a medicine shortage signal",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "UID of watching user" },
+        "medicineId": { "type": "string", "description": "Target medicine ID" },
+        "genericName": { "type": "string", "description": "Medicine name" },
+        "jurisdiction": { "type": "string", "description": "Subscribed jurisdiction" },
+        "notifyEmail": { "type": "boolean", "description": "Whether to receive email updates" },
+        "notifyInApp": { "type": "boolean", "description": "Whether to receive in-app alerts" },
+        "createdAt": { "type": "string", "description": "Creation timestamp" }
+      },
+      "required": ["userId", "medicineId", "genericName"]
+    },
+    "triageReview": {
+      "title": "TriageReview",
+      "description": "Human-in-the-loop professional review decision record",
+      "type": "object",
+      "properties": {
+        "eventId": { "type": "string", "description": "Associated shortage event ID" },
+        "reviewerId": { "type": "string", "description": "UID of reviewing professional" },
+        "reviewerName": { "type": "string", "description": "Name of reviewer" },
+        "decision": { "type": "string", "enum": ["APPROVE_RECONCILIATION", "MAINTAIN_SPLIT", "REQUEST_MANUAL_PULL", "ESCALATE"], "description": "Review disposition" },
+        "rationale": { "type": "string", "description": "Clinical or regulatory rationale" },
+        "timestamp": { "type": "string", "description": "ISO timestamp of review" }
+      },
+      "required": ["eventId", "reviewerId", "decision", "rationale"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "userProfile",
+      "description": "User profile documents keyed by Auth UID"
+    },
+    "/shortage_events/{eventId}": {
+      "schema": "shortageEvent",
+      "description": "Public and professional shortage intelligence records"
+    },
+    "/users/{userId}/watchlist/{watchId}": {
+      "schema": "watchlistItem",
+      "description": "User-specific medicine watchlists"
+    },
+    "/triage_reviews/{reviewId}": {
+      "schema": "triageReview",
+      "description": "Audit-linked human review decisions"
+    }
+  }
+}

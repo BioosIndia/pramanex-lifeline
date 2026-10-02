@@ -1,0 +1,37 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Shortage events are publicly readable; writable by authenticated professionals/admins
+    match /shortage_events/{eventId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
+    // User profiles can be read and updated by their owner
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isOwner(userId);
+
+      // User's private watchlist subcollection
+      match /watchlist/{watchId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+
+    // Triage reviews can be read and written by authenticated professionals
+    match /triage_reviews/{reviewId} {
+      allow read, create: if isAuthenticated();
+      allow update, delete: if isAuthenticated();
+    }
+  }
+}

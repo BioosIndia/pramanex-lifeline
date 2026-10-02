@@ -1,0 +1,6 @@
+{
+  "name": "PRAMANEX LIFELINE",
+  "description": "Drug Shortage & Medicine Supply Intelligence OS - Source-linked, freshness-aware, jurisdiction-specific medicine supply intelligence.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
